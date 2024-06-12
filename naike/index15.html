@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora</title>
+    <style>
+        .calculator {
+            margin: 20px auto;
+            width: 220px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        .calculator input[type="button"] {
+            width: 50px;
+            height: 50px;
+            margin: 5px;
+            font-size: 18px;
+        }
+        .calculator input[type="text"] {
+            width: 210px;
+            height: 50px;
+            margin: 5px;
+            text-align: right;
+            font-size: 18px;
+            padding-right: 10px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <input type="text" id="display" readonly>
+        <br>
+        <input type="button" value="7" onclick="appendNumber(7)">
+        <input type="button" value="8" onclick="appendNumber(8)">
+        <input type="button" value="9" onclick="appendNumber(9)">
+        <input type="button" value="/" onclick="appendOperator('/')">
+        <br>
+        <input type="button" value="4" onclick="appendNumber(4)">
+        <input type="button" value="5" onclick="appendNumber(5)">
+        <input type="button" value="6" onclick="appendNumber(6)">
+        <input type="button" value="*" onclick="appendOperator('*')">
+        <br>
+        <input type="button" value="1" onclick="appendNumber(1)">
+        <input type="button" value="2" onclick="appendNumber(2)">
+        <input type="button" value="3" onclick="appendNumber(3)">
+        <input type="button" value="-" onclick="appendOperator('-')">
+        <br>
+        <input type="button" value="0" onclick="appendNumber(0)">
+        <input type="button" value="." onclick="appendDot()">
+        <input type="button" value="C" onclick="clearDisplay()">
+        <input type="button" value="+" onclick="appendOperator('+')">
+        <br>
+        <input type="button" value="=" onclick="calculate()">
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '';
+        let currentOperator = '';
+        let firstOperand = null;
+        let waitingForSecondOperand = false;
+
+        function appendNumber(number) {
+            if (waitingForSecondOperand) {
+                currentInput = number.toString();
+                waitingForSecondOperand = false;
+            } else {
+                currentInput += number.toString();
+            }
+            display.value = currentInput;
+        }
+
+        function appendOperator(operator) {
+            if (firstOperand === null) {
+                firstOperand = parseFloat(currentInput);
+            } else if (currentOperator) {
+                const result = calculate();
+                display.value = result;
+                firstOperand = result;
+            }
+            currentOperator = operator;
+            waitingForSecondOperand = true;
+        }
+
+        function appendDot() {
+            if (!currentInput.includes('.')) {
+                currentInput += '.';
+                display.value = currentInput;
+            }
+        }
+
+        function clearDisplay() {
+            currentInput = '';
+            currentOperator = '';
+            firstOperand = null;
+            waitingForSecondOperand = false;
+            display.value = '';
+        }
+
+        function calculate() {
+            if (currentOperator && waitingForSecondOperand === false) {
+                const secondOperand = parseFloat(currentInput);
+                let result = 0;
+                switch (currentOperator) {
+                    case '+':
+                        result = firstOperand + secondOperand;
+                        break;
+                    case '-':
+                        result = firstOperand - secondOperand;
+                        break;
+                    case '*':
+                        result = firstOperand * secondOperand;
+                        break;
+                    case '/':
+                        if (secondOperand !== 0) {
+                            result = firstOperand / secondOperand;
+                        } else {
+                            alert("Erro: Divisão por zero não é permitida.");
+                            return;
+                        }
+                        break;
+                    default:
+                        return;
+                }
+                currentInput = result.toString();
+                display.value = result;
+                firstOperand = result;
+                currentOperator = '';
+                waitingForSecondOperand = true;
+                return result;
+            }
+        }
+    </script>
+</body>
+</html>
